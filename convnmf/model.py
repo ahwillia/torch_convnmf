@@ -17,7 +17,7 @@ def conv_predict(W, H):
         Holds motifs / sequences.
 
     H : torch.Tensor
-        Has shape (n_components, n_features, n_timebins + n_lags - 1)
+        Has shape (n_components, n_timebins + n_lags - 1)
         Holds temporal factors.
 
     Returns
