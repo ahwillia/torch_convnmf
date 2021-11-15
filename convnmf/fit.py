@@ -8,11 +8,11 @@ def fit_convnmf(
         data, *, n_components, n_lags, loss, tol=1e-3,
         patience=10, init_lr=1e-2, momentum=0.0,
         backtrack_factor=0.5, max_iters=100,
-        verbosity=1
+        verbosity=1, device=torch.device('cpu')
     ):
 
     # Construct model.
-    model = ConvNMF(data, n_components, n_lags, loss)
+    model = ConvNMF(data, n_components, n_lags, loss).to(device)
 
     # Keep track of best parameters and best loss.
     best_params = (

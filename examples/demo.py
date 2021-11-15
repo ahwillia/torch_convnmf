@@ -1,3 +1,4 @@
+import torch
 from convnmf.datasets import synthetic_sequences
 from convnmf import fit_convnmf
 
@@ -12,13 +13,12 @@ params = {
 }
 data = synthetic_sequences(**params)
 
-model, optimizer = fit_convnmf(
+model = fit_convnmf(
 	data,
 	n_components=params["n_components"],
 	n_lags=params["n_lags"],
 	loss="poisson",
-	tol=1e-3
+	tol=1e-3,
+	device=torch.device("cpu")
 )
-
-# result.plot()
 
