@@ -18,20 +18,21 @@ def synthetic_sequences(
 
         # Add structure to motifs
         for feature, component in enumerate(
-                rs.choice(n_components, size=n_features)
+                np.sort(rs.choice(n_components, size=n_features))
             ):
             W[feature, component] += _gauss_plus_delay(n_lags)
 
         # Determine noise
         noise = noise_scale * rs.rand(n_features, n_timebins)
 
-        # Add noise to model prediction
-        data = conv_predict(
-            torch.from_numpy(W),
-            torch.from_numpy(H)
-        ) + torch.from_numpy(noise)
+        # Convert to torch
+        W = torch.from_numpy(W).type(dtype)
+        H = torch.from_numpy(H).type(dtype)
 
-        return data.type(dtype)
+        # Add noise to model prediction
+        data = conv_predict(W, H) + torch.from_numpy(noise).type(dtype)
+
+        return data.type(dtype), W, H
 
 
 def _gauss_plus_delay(n_steps):

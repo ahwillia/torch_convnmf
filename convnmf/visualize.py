@@ -1,13 +1,15 @@
 """
 Functions to visualize model results.
 """
-import numpy as np
+import torch
 import matplotlib.pyplot as plt
 from matplotlib.gridspec import GridSpec
 
 
-def plot_result(data, W, H, tmin=0, tmax=-1, outer_pad=.05, inner_pad=.05,
-                data_ax_height=.7, data_ax_width=.7, figsize=(10, 6)):
+def plot_convnmf(
+        data, W, H, tmin=0, tmax=-1, outer_pad=.05, inner_pad=.05,
+        data_ax_height=.7, data_ax_width=.7, figsize=(10, 6)
+    ):
     """Plots model factors and data.
 
     Parameters
@@ -15,9 +17,9 @@ def plot_result(data, W, H, tmin=0, tmax=-1, outer_pad=.05, inner_pad=.05,
     data : ndarray
         Matrix holding data or model prediction (num_features x num_timesteps).
     W : ndarray
-        Temporal motifs (num_lags x num_features x num_components)
+        Temporal motifs (num_features x num_components x num_lags)
     H : ndarray
-        Times that motifs occur (num_componets x num_timesteps)
+        Times that motifs occur (num_componets x num_timesteps-n_lags+1)
     tmin, tmax : int
         Subset of timesteps to plot for data and H.
     outer_pad : float
@@ -112,7 +114,7 @@ def plot_result(data, W, H, tmin=0, tmax=-1, outer_pad=.05, inner_pad=.05,
         ax.axis('off')
 
     # Plot motifs.
-    for ax, w in zip(w_ax, W.T):
+    for ax, w in zip(w_ax, torch.swapaxes(W, 0, 1)):
         ax.imshow(w, aspect='auto')
 
     return fig, w_ax, h_ax, data_ax

@@ -16,8 +16,8 @@ def fit_convnmf(
 
     # Keep track of best parameters and best loss.
     best_params = (
-        model._W_pre.detach().clone(),
-        model._H_pre.detach().clone()
+        model.W.detach().clone(),
+        model.H.detach().clone()
     )
     best_loss = model()
     
@@ -26,12 +26,12 @@ def fit_convnmf(
 
     optimizer = SGD([
         {
-            "params": [model._W_pre],
-            "lr": init_lr / torch.norm(model._W_pre.grad.data)
+            "params": [model.W],
+            "lr": init_lr / torch.norm(model.W.grad.data)
         },
         {
-            "params": [model._H_pre],
-            "lr": init_lr / torch.norm(model._W_pre.grad.data)
+            "params": [model.H],
+            "lr": init_lr / torch.norm(model.H.grad.data)
         }
     ], momentum=momentum)
 
@@ -44,7 +44,7 @@ def fit_convnmf(
     loss_has_not_changed = True
     effective_lr = init_lr
 
-    while convergence_counter < patience:
+    while (itercount < max_iters) and (convergence_counter < patience):
 
         # Compute loss and gradients.
         optimizer.zero_grad()
@@ -81,8 +81,8 @@ def fit_convnmf(
             losses.append(loss)
             best_loss = loss
             best_params = (
-                model._W_pre.detach().clone(),
-                model._H_pre.detach().clone()
+                model.W.detach().clone(),
+                model.H.detach().clone()
             )
 
             # Increase learning rate
@@ -93,12 +93,17 @@ def fit_convnmf(
             # Take another parameter step.
             optimizer.step()
 
+            # Project out negative values.
+            with torch.no_grad():
+                model.W.relu_()
+                model.H.relu_()
+
         # If loss has gone up.
         else:
 
             # Reset parameters.
-            model._W_pre.data = best_params[0]
-            model._H_pre.data = best_params[1]
+            model.W.data = best_params[0]
+            model.H.data = best_params[1]
 
             # Decrease learning rate.
             effective_lr *= backtrack_factor

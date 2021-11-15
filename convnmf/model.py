@@ -64,12 +64,12 @@ class ConvNMF(torch.nn.Module):
 
         # Rescale parameters to roughly match data norm.
         data_norm = torch.norm(data)
-        _W_pre *= torch.sqrt(data_norm) / torch.norm(_W_pre)
-        _H_pre *= torch.sqrt(data_norm) / torch.norm(_H_pre)
+        _W_pre *= torch.sqrt(data_norm) / torch.norm(F.softplus(_W_pre))
+        _H_pre *= torch.sqrt(data_norm) / torch.norm(F.softplus(_H_pre))
 
         # Wrap parameters in nn.Parameter to track gradients.
-        self._W_pre = torch.nn.Parameter(_W_pre)
-        self._H_pre = torch.nn.Parameter(_H_pre)
+        self.W = torch.nn.Parameter(_W_pre)
+        self.H = torch.nn.Parameter(_H_pre)
 
         # Save metadata.
         self.data = data
@@ -79,18 +79,13 @@ class ConvNMF(torch.nn.Module):
         self.n_lags = n_lags
         self.loss = loss
 
-    @property
-    def W(self):
-        return F.softplus(self._W_pre)
-    
-    @property
-    def H(self):
-        return F.softplus(self._H_pre)
+    def prediction(self):
+        return conv_predict(self.W, self.H)
 
     def forward(self):
         
         # Compute model prediction.
-        pred = conv_predict(self.W, self.H)
+        pred = self.prediction()
 
         # Evaluate loss.
         if self.loss == "quadratic":
