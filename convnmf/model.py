@@ -54,10 +54,12 @@ class ConvNMF(torch.nn.Module):
 
         # Initialize parameters.
         _W_pre = torch.rand(
-            n_features, n_components, n_lags
+            n_features, n_components, n_lags,
+            device=data.device
         )
         _H_pre = torch.rand(
-            n_components, n_timebins + n_lags - 1
+            n_components, n_timebins + n_lags - 1,
+            device=data.device
         )
 
         # Rescale parameters to roughly match data norm.

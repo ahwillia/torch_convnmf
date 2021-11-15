@@ -12,7 +12,7 @@ def fit_convnmf(
     ):
 
     # Construct model.
-    model = ConvNMF(data, n_components, n_lags, loss).to(data.device)
+    model = ConvNMF(data, n_components, n_lags, loss)
 
     # Keep track of best parameters and best loss.
     best_params = (
