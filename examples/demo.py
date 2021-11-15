@@ -9,7 +9,8 @@ params = {
     "n_components": 3,
     "n_features": 100,
     "n_lags": 50,
-    "n_timebins": 300
+    "n_timebins": 300,
+    "noise_scale": 0.01,
 }
 data, W_true, H_true = synthetic_sequences(**params)
 fig, w_ax, h_ax, data_ax = plot_convnmf(data, W_true, H_true)
@@ -20,7 +21,8 @@ model = fit_convnmf(
     n_components=params["n_components"],
     n_lags=params["n_lags"],
     loss="quadratic",
-    tol=1e-3,
+    rtol=1e-3,
+    atol=1e-5,
     max_iters=1000
 )
 

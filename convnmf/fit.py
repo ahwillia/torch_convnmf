@@ -1,11 +1,13 @@
 import torch
 from torch.optim import SGD
+import math
 
 from convnmf.model import ConvNMF
 
 
 def fit_convnmf(
-        data, *, n_components, n_lags, loss, tol=1e-3,
+        data, *, n_components, n_lags, loss,
+        rtol=1e-3, atol=1e-5,
         patience=10, init_lr=1e-2, momentum=0.0,
         backtrack_factor=0.5, max_iters=100,
         verbosity=1
@@ -61,15 +63,16 @@ def fit_convnmf(
                 (" " * 10) +
                 f"LOSS: {loss:8.4f}" +
                 (" " * 10) +
-                # f"BEST: {best_loss:8.4f}" +
-                # (" " * 10) +
                 f"LR: {effective_lr:10.4f}" +
                 (" " * 10) +
                 f"CVRG : {convergence_counter}"
             )
 
         # Count number of times the loss changes
-        if (upcount > 0) and (abs(loss - best_loss) < (tol * abs(best_loss))):
+        loss_is_close = math.isclose(
+            loss, best_loss, rel_tol=rtol, abs_tol=atol
+        )
+        if (upcount > 0) and loss_is_close:
             convergence_counter += 1
         else:
             convergence_counter = 0
