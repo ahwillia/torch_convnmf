@@ -18,7 +18,6 @@ model = fit_convnmf(
 	n_components=params["n_components"],
 	n_lags=params["n_lags"],
 	loss="poisson",
-	tol=1e-3,
-	device=torch.device("cpu")
+	tol=1e-3
 )
 
